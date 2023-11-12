@@ -1,30 +1,32 @@
 import unittest
-from aluno import AlunoClass
-from turma import TurmaClass
-from conexao import ConexaoClass
-import mongomock
-#Projeto: https://github.com/mongomock/mongomock
+import aluno as a;
+import turma as t;
 
+class turmaTest(unittest.TestCase):
 
-class alunoTest(unittest.TestCase):
-
-  @mongomock.patch(servers=(('localhost.com', 27017), ))
   def setUp(self):
-    print('Teste', self._testMethodName, 'sendo executado...')
-    self.aluno = AlunoClass('Fabio', 'Teixeira', 10)
-    self.turma = TurmaClass()
-    self.turma.cadastrarAlunos([self.aluno])
-    self.conexao = ConexaoClass.conexaoMongoDB(self,
-                                               url='localhost.com',
-                                               banco='faculdade')
+    print('Teste', self._testMethodName, 'sendo executado...');
+    self.alunos = [];
+    self.alunos.append(a.Aluno('Fabio', 'Teixeira', 11));
+    self.alunos.append(a.Aluno('Fabiano', 'Teixeira', 7));
+    self.alunos.append(a.Aluno('Melissa', 'Teixeira', 8));
+    self.alunos.append(a.Aluno('Rafael', 'Teixeira', 9));
+    self.alunos.append(a.Aluno('Angela', 'Teixeira', 6));
+    self.alunos.append(a.Aluno('Angela', 'Teixeira', -1));    
+    self.turmaObject = t.Turma();
+    self.turmaObject.cadastrarAlunos(self.alunos);
+  
+  def tearDown(self):
+    print('Teste', self._testMethodName, 'finalizado.'); 
+  
+  def testMaior(self):      
+    self.assertEqual(9, self.turmaObject.maiorNota.nota, 'Erro ao encontrar maior nota');
 
-  def test_salvarAluno(self):
-    resposta = self.aluno.salvar(conexao=self.conexao, colecao='aluno')
-    self.assertEqual(True, resposta, 'Aluno cadastrado incorretamente!')
+  def testMenor(self):    
+    self.assertEqual(6, self.turmaObject.menorNota.nota, 'Erro ao encontrar menor nota');
 
-  def test_salvarTurma(self):
-    resposta = self.turma.salvar(conexao=self.conexao, colecao='turma')
-    self.assertEqual(True, resposta, 'Turma cadastrada incorretamente!')
+  def testIntervalo(self):    
+    self.assertTrue((self.turmaObject.menorNota.nota > 0 and self.turmaObject.maiorNota.nota <= 10), 'Erro ao verificar intervalo')    
 
 
 if __name__ == "__main__":
